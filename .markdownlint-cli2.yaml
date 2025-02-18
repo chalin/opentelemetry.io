@@ -1,0 +1,16 @@
+customRules:
+  - scripts/mdl/require-heading-ids.js
+rules:
+  emphasis-style: false # MD036
+  line-length: false # MD013
+  link-fragments: false # MD034
+  list-marker-space: false # MD030
+  no-emphasis-as-header: false # MD036
+  no-hard-tabs: false # MD010
+  no-inline-html: false # MD033
+  no-trailing-punctuation: false # MD026
+  no-trailing-spaces: # MD009
+    br_spaces: 0
+    strict: true
+  custom-rules-below-this-point: false
+  trim-code-block-and-unindent: true # MD046
