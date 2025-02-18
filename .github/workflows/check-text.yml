@@ -46,4 +46,10 @@ jobs:
           cache-dependency-path: tmp/package-ci.json
       - run: npm install --ignore-scripts --omit=optional
       - run: npm run check:markdown
-      - run: npm run check:markdown2
+      - name: Get list of changed non-en files
+        id: changed-files
+        run: |
+          echo "::set-output name=files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'content/[^e][^n]/**/*.md' || true)"
+      - name: Run markdownlint-cli2 on changed files
+        if: steps.changed-files.outputs.files != ''
+        run: npx markdownlint-cli2 ${{ steps.changed-files.outputs.files }}

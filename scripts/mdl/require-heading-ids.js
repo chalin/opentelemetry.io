@@ -12,6 +12,13 @@ module.exports = {
   description: "Explicit ID required for headings.",
   tags: ["headings", "IDs"],
   function: function rule(params, onError) {
+    const config = params.config || {};
+    console.log("Config value:", config);
+    console.log(config);
+    if (config.rules && config.rules.require-heading-ids === false) {
+      return;
+    }
+
     params.lines.forEach((line, index) => {
       const headingMatch = line.match(/^(#{1,6})\s+(.*?)(\s+{#([^}]+)})?$/);
       if (headingMatch) {

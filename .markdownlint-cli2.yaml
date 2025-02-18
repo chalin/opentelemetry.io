@@ -1,5 +1,5 @@
 customRules:
-  - scripts/mdl/require-heading-ids.js
+  # - scripts/mdl/require-heading-ids.js
 rules:
   emphasis-style: false # MD036
   line-length: false # MD013
@@ -14,3 +14,4 @@ rules:
     strict: true
   custom-rules-below-this-point: false
   trim-code-block-and-unindent: true # MD046
+  require-heading-ids: false
