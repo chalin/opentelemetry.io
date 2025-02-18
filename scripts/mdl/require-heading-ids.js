@@ -1,8 +1,15 @@
-const { slug } = require("github-slugger");
+// const { slug } = require("github-slugger");
+function slug(headingText) {
+  return headingText
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
 
 module.exports = {
   names: ["require-heading-ids"],
-  description: "Ensure all headings have explicit IDs, adding one if missing.",
+  description: "Explicit ID required for headings.",
   tags: ["headings", "IDs"],
   function: function rule(params, onError) {
     params.lines.forEach((line, index) => {
@@ -17,9 +24,9 @@ module.exports = {
           const fixedLine = `${headingMatch[1]} ${headingText} {#${generatedId}}`;
           onError({
             lineNumber: index + 1,
-            detail: `Heading is missing an explicit ID. Adding {#${generatedId}}.`,
-            fixable: true,
-            fix: (fixer) => fixer.replaceLine(index + 1, fixedLine),
+            detail: `Heading is missing an explicit ID.`, //  Add {#${generatedId}}
+            // fixable: true,
+            // fix: (fixer) => fixer.replaceLine(index + 1, fixedLine),
           });
         }
       }
