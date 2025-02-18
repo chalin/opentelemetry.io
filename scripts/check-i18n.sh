@@ -221,17 +221,22 @@ function update_file_i18n_hash() {
 }
 
 function check_heading_ids() {
+  echo ">> Checking heading IDs for $f"
+
   local f="$1"
   local en_version="$2"
 
-  local non_en_ids=$(grep -oP '(?<=id=")[^"]+' "$f" | sort)
-  local en_ids=$(grep -oP '(?<=id=")[^"]+' "$en_version" | sort)
+  local non_en_ids=$(perl -nle 'print $1 if /id="([^"]+)"/' "$f" | sort)
+  local en_ids=$(perl -nle 'print $1 if /id="([^"]+)"/' "$en_version" | sort)
 
   if [[ "$non_en_ids" != "$en_ids" ]]; then
     echo "ERROR: Heading IDs do not match for $f"
     echo "Non-en IDs: $non_en_ids"
     echo "En IDs: $en_ids"
     EXIT_STATUS=1
+  else
+    echo "Non-en IDs: $non_en_ids"
+    echo "En IDs: $en_ids"
   fi
 }
 

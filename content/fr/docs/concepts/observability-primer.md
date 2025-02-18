@@ -28,7 +28,7 @@ besoin d'ajouter une instrumentation supplémentaire.
 [OpenTelemetry](/docs/what-is-opentelemetry/) est le mécanisme permettant
 d'instrumenter le code des applications afin de rendre le système observable.
 
-## Fiabilité et métriques {#reliability-and-metrics}
+## Fiabilité et métriques {#reliability-and-metrics2}
 
 Le terme **télémétrie** fait référence aux données émises par un système et son
 comportement. Les données peuvent prendre la forme de
