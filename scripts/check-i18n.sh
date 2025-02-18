@@ -13,10 +13,10 @@ FLAG_FAIL_ON_LIST_OR_MISSING=0
 FLAG_INFO=""
 FLAG_QUIET=""
 FLAG_VERBOSE=""
+FLAG_CHECK_HEADING_IDS=0
 I18N_DLC_KEY="default_lang_commit"
 LIST_KIND="DRIFTED" # or "ALL" or "NEW"
 TARGET_PATHS=""
-
 
 function _usage() {
   cat <<EOS
@@ -47,6 +47,7 @@ Options:
 
   -d       Output diff details.
   -h       Help! Output this usage info.
+  -H       Ensure non-en pages have heading IDs and that they match the corresponding en page.
 
   -i       Print commit hashes of the local 'main' branch that might be useful to
            se as an argument to -c.
@@ -65,7 +66,7 @@ function usage() {
 }
 
 function process_CLI_args() {
-  while getopts ":ac:dhinqvx" opt; do
+  while getopts ":ac:dhHinqvx" opt; do
     case $opt in
       a)
         LIST_KIND="ALL";;
@@ -86,6 +87,8 @@ function process_CLI_args() {
         FLAG_VERBOSE=1;;
       x)
         FLAG_FAIL_ON_LIST_OR_MISSING=1;;
+      H)
+        FLAG_CHECK_HEADING_IDS=1;;
       \?)
         echo -e "ERROR: invalid option: -$OPTARG\n" >&2
         usage 1;;
@@ -217,6 +220,21 @@ function update_file_i18n_hash() {
   set_file_i18n_hash "$f" "$HASH" "$msg" $pre_msg $post_msg
 }
 
+function check_heading_ids() {
+  local f="$1"
+  local en_version="$2"
+
+  local non_en_ids=$(grep -oP '(?<=id=")[^"]+' "$f" | sort)
+  local en_ids=$(grep -oP '(?<=id=")[^"]+' "$en_version" | sort)
+
+  if [[ "$non_en_ids" != "$en_ids" ]]; then
+    echo "ERROR: Heading IDs do not match for $f"
+    echo "Non-en IDs: $non_en_ids"
+    echo "En IDs: $en_ids"
+    EXIT_STATUS=1
+  fi
+}
+
 function main() {
   process_CLI_args "$@"
 
@@ -311,6 +329,10 @@ function main() {
     elif [[ $LIST_KIND == "ALL" || -n $FLAG_VERBOSE ]]; then
       ((FILE_PROCESSED_COUNT++))
       echo -e "File is in sync\t$f - $LASTCOMMIT"
+    fi
+
+    if [[ $FLAG_CHECK_HEADING_IDS -eq 1 ]]; then
+      check_heading_ids "$f" "$EN_VERSION"
     fi
   done
 
