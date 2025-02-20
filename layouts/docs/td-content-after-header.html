@@ -1,3 +1,4 @@
+{{ $fallbackPage := partial "i18n/fallback-page.html" . -}}
 {{ $pageProseLang := partial "i18n/lang.html" . -}}
 {{ $siteLang := .Site.Language -}}
 
@@ -11,16 +12,61 @@ https://github.com/open-telemetry/opentelemetry.io/issues/6340
 
 */ -}}
 
-{{ if and
+{{ if ne .Language.Lang "en" -}}
+  {{ if and
     (ne $siteLang $pageProseLang)
     (not (.Param "disable_translation_not_found_msg"))
--}}
-  {{ with partial "_inline/ot-page-not-found-banner.html" . -}}
-  <div class="pageinfo pageinfo-secondary">
-    <div class="ps-4">
-      {{ . }}
+  -}}
+    {{ with partial "_inline/ot-page-not-found-banner.html" . -}}
+    <div class="pageinfo pageinfo-secondary">
+      <div class="ps-4">
+        {{ . }}
+      </div>
     </div>
-  </div>
+    {{ end -}}
+  {{ else -}}
+    {{ with partial "_inline/ot-page-drifted-banner.html" . -}}
+      {{ . -}}
+    {{ end -}}
+  {{ end -}}
+{{ end -}}
+
+{{ define "partials/_inline/ot-page-drifted-banner.html" }}
+  {{ $resultsArray := where .Translations "Lang" "en" -}}
+  {{ $defaultLangPage := index $resultsArray 0 -}}
+
+  {{ if or (not $defaultLangPage)
+      (ne .Params.default_lang_commit $defaultLangPage.GitInfo.Hash) -}}
+      <div class="pageinfo pageinfo-secondary">
+        <div class="ps-4">
+          <i class="fa-solid fa-triangle-exclamation" style="margin-left: -1.9rem; padding-right: 0.5rem;"></i>
+          {{ if and $defaultLangPage .Params.default_lang_commit -}}
+            A <strong>newer version</strong> of the
+            <a href="{{ $defaultLangPage.RelPermalink }}">corresponding English page</a> exists,
+            so the content below may be outdated and some links may be invalid.
+            <details class="mt-2">
+              <summary>More information ...</summary>
+              <p>
+                To view what has changed in the English page since this page was
+                last updated, visit the
+                {{ $compareUrl := printf "%s/compare/%s...%s"
+                    .Site.Params.github_repo .Params.default_lang_commit $defaultLangPage.GitInfo.Hash -}}
+                <a href="{{ $compareUrl }}" class="external-link" target="_blank" rel="noopener">
+                  GitHub compare
+                  {{ substr .Params.default_lang_commit 0 8 }}...{{ $defaultLangPage.GitInfo.AbbreviatedHash }}
+                </a>, select the <b>Files changed</b> tab, and search for
+                {{ $defLangPath := strings.TrimPrefix (add hugo.WorkingDir "/") $defaultLangPage.File.Filename -}}
+                <code>{{ $defLangPath }}</code>.
+              </p>
+            </details>
+          {{ else if .Params.default_lang_commit -}}
+            This page is outdated. It no longer has a corresponding English page.
+          {{ else -}}
+            This page is possibly outdated. The commit hash of the corresponding
+            English page is missing.
+          {{ end -}}
+        </div>
+      </div>
   {{ end -}}
 {{ end -}}
 
@@ -37,4 +83,3 @@ https://github.com/open-telemetry/opentelemetry.io/issues/6340
     {{ warnf "_inline/ot-page-not-found-banner: '%s' not found from page %s (%s)" $path .Page.Path $lang -}}
   {{ end -}}
 {{ end -}}
-
