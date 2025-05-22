@@ -8,7 +8,7 @@ author: >-
 cSpell:ignore: brainer Otterize Shoshan
 ---
 
-{{< blog/integration-badge >}}
+{{< integration-badge >}}
 
 ## A no-brainer integration: Adding OpenTelemetry support to the Otterize network mapper
 
