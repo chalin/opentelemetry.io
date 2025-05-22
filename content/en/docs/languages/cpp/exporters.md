@@ -6,7 +6,7 @@ cSpell:ignore: DWITH
 
 <!-- markdownlint-disable no-duplicate-heading -->
 
-{{% docs/languages/exporters/intro %}}
+{{% languages/exporters/intro %}}
 
 ### Dependencies {#otlp-dependencies}
 

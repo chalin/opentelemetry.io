@@ -8,7 +8,7 @@ weight: 40
 default_lang_commit: 825010e3cfece195ae4dfd019eff080ef8eb6365
 ---
 
-{{% docs/languages/libraries-intro "go" %}}
+{{% languages/libraries-intro "go" %}}
 
 ## Utilizando bibliotecas de instrumentação {#use-instrumentation-libraries}
 

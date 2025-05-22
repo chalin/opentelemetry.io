@@ -73,7 +73,7 @@ For more information, see
 
 ### Exporters
 
-{{% docs/languages/exporters/intro %}}
+{{% languages/exporters/intro %}}
 
 ### Zero-code instrumentation
 

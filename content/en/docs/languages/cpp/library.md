@@ -4,7 +4,7 @@ linkTitle: Libraries
 weight: 40
 ---
 
-{{% docs/languages/libraries-intro cpp %}}
+{{% languages/libraries-intro cpp %}}
 
 ## Using instrumentation libraries
 

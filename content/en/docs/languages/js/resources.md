@@ -5,7 +5,7 @@ description: Add details about your applications' environment to your telemetry
 cSpell:ignore: myhost SIGINT uuidgen WORKDIR
 ---
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 Below you will find introductions on how to set up resource detection with the
 Node.js SDK.

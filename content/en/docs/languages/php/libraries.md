@@ -5,7 +5,7 @@ weight: 40
 cSpell:ignore: Packagist
 ---
 
-{{% docs/languages/libraries-intro "php" %}}
+{{% languages/libraries-intro "php" %}}
 
 ## Use instrumentation libraries
 

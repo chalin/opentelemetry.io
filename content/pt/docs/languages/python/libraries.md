@@ -6,7 +6,7 @@ default_lang_commit: 918511661af010726c8847d7fe41a46231fa59cc
 cSpell:ignore: desinstrumentar httpx instrumentor uninstrument
 ---
 
-{{% docs/languages/libraries-intro "python" %}}
+{{% languages/libraries-intro "python" %}}
 
 ## Use bibliotecas de instrumentação {#use-instrumentation-libraries}
 

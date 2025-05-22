@@ -5,7 +5,7 @@ weight: 70
 
 ## Introduction
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 If you use [Jaeger](https://www.jaegertracing.io/) as your observability
 backend, resource attributes are grouped under the **Process** tab:

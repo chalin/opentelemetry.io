@@ -8,7 +8,7 @@ weight: 22
 default_lang_commit: 3fd0bb513e5d3fa6f178a73584322bcc469f15e0 # patched
 ---
 
-{{% docs/languages/index-intro python /%}}
+{{% languages/index-intro python /%}}
 
 ## Suporte de Versão {#status-and-releases}
 

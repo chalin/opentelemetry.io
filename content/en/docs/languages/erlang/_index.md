@@ -16,7 +16,7 @@ cascade:
 cSpell:ignore: ecto
 ---
 
-{{% docs/languages/index-intro erlang %}}
+{{% languages/index-intro erlang %}}
 
 Packages of the API, SDK and OTLP exporter are published to
 [`hex.pm`](https://hex.pm) as
@@ -37,4 +37,4 @@ OpenTelemetry Erlang supports Erlang 23+ and Elixir 1.13+.
   like [Phoenix](https://www.phoenixframework.org/) and
   [Ecto](https://hexdocs.pm/ecto/Ecto.html)
 
-{{% /docs/languages/index-intro %}}
+{{% /languages/index-intro %}}

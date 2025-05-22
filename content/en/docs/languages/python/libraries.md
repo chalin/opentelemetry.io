@@ -5,7 +5,7 @@ weight: 40
 cSpell:ignore: httpx instrumentor uninstrument
 ---
 
-{{% docs/languages/libraries-intro "python" %}}
+{{% languages/libraries-intro "python" %}}
 
 ## Use instrumentation libraries
 

@@ -8,7 +8,7 @@ weight: 16
 default_lang_commit: 06837fe15457a584f6a9e09579be0f0400593d57 # patched
 ---
 
-{{% docs/languages/index-intro go /%}}
+{{% languages/index-intro go /%}}
 
 ## Mais
 

@@ -6,7 +6,7 @@ default_lang_commit: cd90ab77550fb2e92ca37cb3c753ec2d8bb7d8dc
 
 ## はじめに
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 オブザーバビリティバックエンドに[Jaeger](https://www.jaegertracing.io/)を使用している場合、リソース属性は**Process**タブの下にグループ化されます。
 

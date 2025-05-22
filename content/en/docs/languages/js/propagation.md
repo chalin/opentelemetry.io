@@ -5,7 +5,7 @@ weight: 65
 cSpell:ignore: rolldice
 ---
 
-{{% docs/languages/propagation js %}}
+{{% languages/propagation js %}}
 
 ## Automatic context propagation
 

@@ -3,7 +3,7 @@ title: Resources
 weight: 70
 ---
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 ## Resource Detection
 

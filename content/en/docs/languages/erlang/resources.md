@@ -9,7 +9,7 @@ cSpell:ignore: behaviour
 <!-- markdownlint-disable no-duplicate-heading -->
 <!-- markdownlint-capture -->
 
-{{% docs/languages/resources-intro "an OTP Release" %}}
+{{% languages/resources-intro "an OTP Release" %}}
 
 ## Using resource detectors
 

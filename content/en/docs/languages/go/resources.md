@@ -4,7 +4,7 @@ weight: 70
 cSpell:ignore: sdktrace thirdparty
 ---
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 Resources should be assigned to a tracer, meter, and logger provider at its
 initialization, and are created much like attributes:

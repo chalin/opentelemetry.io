@@ -8,7 +8,7 @@ weight: 16
 default_lang_commit: 1ce408a51513e6eb782032ae5e8d092b7d1647e4
 ---
 
-{{% docs/languages/index-intro go /%}}
+{{% languages/index-intro go /%}}
 
 ## Más información
 

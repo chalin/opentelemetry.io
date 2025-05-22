@@ -5,7 +5,7 @@ default_lang_commit: 12f31f62fcc466532513f6ebccb060c9ea5b9fe4
 cSpell:ignore: sdktrace thirdparty
 ---
 
-{{% docs/languages/resources-intro %}}
+{{% languages/resources-intro %}}
 
 Recursos devem ser adicionados a um `TracerProvider`, `MeterProvider` e
 `LoggerProvider` durante a sua inicialização, e são criados de maneira

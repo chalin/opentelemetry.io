@@ -8,7 +8,7 @@ aliases: [/js, /js/metrics, /js/tracing]
 weight: 20
 ---
 
-{{% docs/languages/index-intro js /%}}
+{{% languages/index-intro js /%}}
 
 {{% include browser-instrumentation-warning.md %}}
 

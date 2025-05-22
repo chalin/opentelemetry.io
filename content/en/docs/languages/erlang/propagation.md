@@ -4,7 +4,7 @@ weight: 60
 cSpell:ignore: elli
 ---
 
-{{% docs/languages/propagation erlang %}}
+{{% languages/propagation erlang %}}
 
 ## Automatic context propagation
 
