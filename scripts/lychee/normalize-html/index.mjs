@@ -18,12 +18,13 @@
 // re-serialize the document.
 //
 // Usage:
-//   node scripts/lychee/normalize-html/index.mjs [--drop-chrome] <src-dir> <out-dir>
-//   node scripts/lychee/normalize-html/index.mjs [--drop-chrome] --in-place <src-dir>
+//   node scripts/lychee/normalize-html/index.mjs [-d|--drop-repeated-regions] <src-dir> <out-dir>
+//   node scripts/lychee/normalize-html/index.mjs [-d|--drop-repeated-regions] --in-place <src-dir>
 // Mirrors the directory tree of <src-dir> into <out-dir>, normalizing `.html`
 // files and hard-linking (or copying) everything else. With `--in-place`, the
 // `.html` files under <src-dir> are rewritten directly and <out-dir> is unused
-// (CI only, where the built tree is throwaway).
+// (CI only, where the built tree is throwaway). `-d` / `--drop-repeated-regions`
+// additionally removes the repeated Docsy chrome (navbar, footer, left-nav).
 //
 // cSpell:ignore proofer
 
@@ -278,14 +279,14 @@ export function normalizeTree(srcDir, outDir, opts = {}) {
 
 function mainCLI() {
   const args = process.argv.slice(2);
-  const drop = args.includes('--drop-chrome');
+  const drop = args.includes('--drop-repeated-regions') || args.includes('-d');
   const inPlace = args.includes('--in-place');
-  const [srcDir, outDir] = args.filter((a) => !a.startsWith('--'));
+  const [srcDir, outDir] = args.filter((a) => !a.startsWith('-'));
   // In place, <out-dir> is unused (HTML is rewritten under <src-dir>); otherwise
   // both are required.
   if (!srcDir || (!inPlace && !outDir)) {
     console.error(
-      'Usage: node scripts/lychee/normalize-html/index.mjs [--drop-chrome] [--in-place] <src-dir> [<out-dir>]',
+      'Usage: node scripts/lychee/normalize-html/index.mjs [-d|--drop-repeated-regions] [--in-place] <src-dir> [<out-dir>]',
     );
     process.exit(2);
   }
