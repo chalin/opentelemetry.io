@@ -48,7 +48,7 @@
     "_lychee:seed-cache": "test -f .lycheecache || node scripts/lychee/refcache-to-lycheecache/index.mjs static/refcache.json .lycheecache",
     "_lychee:reseed-cache": "rm -f .lycheecache && npm run _lychee:seed-cache",
     "_lychee:setup": "npm run seq -- generate:config:links:lychee _lychee:seed-cache",
-    "_lychee:normalize": "node scripts/lychee/normalize-html/index.mjs public tmp/normalized/public",
+    "_lychee:normalize": "node scripts/lychee/normalize-html/index.mjs --drop-chrome public tmp/normalized/public",
     "_pin:submodule": "scripts/pin-submodules.pl",
     "_prebuild": "npm run seq -- get:submodule cp:spec generate:config-types",
     "_prepare:docsy": "cd themes/docsy && npm install",
