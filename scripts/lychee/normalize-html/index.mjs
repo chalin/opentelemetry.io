@@ -18,9 +18,12 @@
 // re-serialize the document.
 //
 // Usage:
-//   node scripts/lychee/normalize-html/index.mjs <src-dir> <out-dir>
+//   node scripts/lychee/normalize-html/index.mjs [--drop-chrome] <src-dir> <out-dir>
+//   node scripts/lychee/normalize-html/index.mjs [--drop-chrome] --in-place <src-dir>
 // Mirrors the directory tree of <src-dir> into <out-dir>, normalizing `.html`
-// files and hard-linking (or copying) everything else.
+// files and hard-linking (or copying) everything else. With `--in-place`, the
+// `.html` files under <src-dir> are rewritten directly and <out-dir> is unused
+// (CI only, where the built tree is throwaway).
 //
 // cSpell:ignore proofer
 
@@ -36,6 +39,10 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { regionsToDrop, detectLocales } from './policy.mjs';
+
+// Marker file written into a tree normalized in place, so the check step can
+// tell an already-normalized `public/` from a raw build.
+export const NORMALIZED_MARKER = '.lychee-normalized';
 
 const VOID = new Set([
   'area',
@@ -224,8 +231,15 @@ export const stripIgnoredLinks = (html) => normalizeHtml(html);
 //
 // With `opts.drop`, P2 chrome dropping is applied per page: `opts.locales` (the
 // non-default locale prefixes) is detected from the tree when not supplied.
+//
+// With `opts.inPlace`, `outDir` is ignored and `.html` files are rewritten in
+// `srcDir` directly — no copy, no asset linking, no stale-output sweep. Intended
+// for CI, where the built `public/` is throwaway and nothing downstream reads
+// it; it skips the dominant copy cost. Never use it where `public/` is consumed
+// later (local diffing, `_commit:public`).
 export function normalizeTree(srcDir, outDir, opts = {}) {
   const dropChrome = !!opts.drop;
+  const inPlace = !!opts.inPlace;
   const locales =
     opts.locales ??
     (dropChrome
@@ -234,20 +248,20 @@ export function normalizeTree(srcDir, outDir, opts = {}) {
   let htmlFiles = 0;
   let linkedFiles = 0;
   let copiedFiles = 0;
-  rmSync(outDir, { recursive: true, force: true });
+  if (!inPlace) rmSync(outDir, { recursive: true, force: true });
   const walk = (src, out, rel) => {
-    mkdirSync(out, { recursive: true });
+    if (!inPlace) mkdirSync(out, { recursive: true });
     for (const entry of readdirSync(src, { withFileTypes: true })) {
       const from = path.join(src, entry.name);
-      const to = path.join(out, entry.name);
+      const to = inPlace ? from : path.join(out, entry.name);
       const relPath = rel ? `${rel}/${entry.name}` : entry.name;
       if (entry.isDirectory()) {
-        walk(from, to, relPath);
+        walk(from, inPlace ? from : to, relPath);
       } else if (entry.isFile() && entry.name.endsWith('.html')) {
         const drop = dropChrome ? regionsToDrop(relPath, locales) : undefined;
         writeFileSync(to, normalizeHtml(readFileSync(from, 'utf8'), { drop }));
         htmlFiles++;
-      } else if (entry.isFile()) {
+      } else if (entry.isFile() && !inPlace) {
         try {
           linkSync(from, to);
           linkedFiles++;
@@ -265,10 +279,13 @@ export function normalizeTree(srcDir, outDir, opts = {}) {
 function mainCLI() {
   const args = process.argv.slice(2);
   const drop = args.includes('--drop-chrome');
+  const inPlace = args.includes('--in-place');
   const [srcDir, outDir] = args.filter((a) => !a.startsWith('--'));
-  if (!srcDir || !outDir) {
+  // In place, <out-dir> is unused (HTML is rewritten under <src-dir>); otherwise
+  // both are required.
+  if (!srcDir || (!inPlace && !outDir)) {
     console.error(
-      'Usage: node scripts/lychee/normalize-html/index.mjs [--drop-chrome] <src-dir> <out-dir>',
+      'Usage: node scripts/lychee/normalize-html/index.mjs [--drop-chrome] [--in-place] <src-dir> [<out-dir>]',
     );
     process.exit(2);
   }
@@ -276,13 +293,16 @@ function mainCLI() {
   const { htmlFiles, linkedFiles, copiedFiles } = normalizeTree(
     srcDir,
     outDir,
-    {
-      drop,
-    },
+    { drop, inPlace },
   );
+  // In place, the source tree IS the normalized tree. Leave a marker so the
+  // check step knows `public/` is already normalized and need not warn that it
+  // is checking a raw tree (see scripts/lychee/check/index.sh).
+  if (inPlace) writeFileSync(path.join(srcDir, NORMALIZED_MARKER), '');
   const secs = ((performance.now() - start) / 1000).toFixed(1);
+  const dest = inPlace ? `${srcDir} (in place)` : outDir;
   console.error(
-    `Normalized ${htmlFiles} HTML file(s) into ${outDir} ` +
+    `Normalized ${htmlFiles} HTML file(s) into ${dest} ` +
       `(${linkedFiles} linked, ${copiedFiles} copied${drop ? ', chrome dropped' : ''}) ` +
       `in ${secs}s.`,
   );

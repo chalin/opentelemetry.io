@@ -28,6 +28,9 @@ test -d "$PUBLIC" || {
 NORMALIZED="$PWD/tmp/normalized/public"
 if [ -d "$NORMALIZED" ]; then
   ROOT="$NORMALIZED"
+elif [ -f "$PUBLIC/.lychee-normalized" ]; then
+  # `public/` was normalized in place (CI, where the built tree is throwaway).
+  ROOT="$PUBLIC"
 else
   ROOT="$PUBLIC"
   echo "[note] normalized tree not found at $NORMALIZED; checking public/ directly (data-proofer-ignore links will be enqueued). Run 'npm run precheck:links:lychee' to normalize." >&2

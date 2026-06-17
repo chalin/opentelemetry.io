@@ -135,6 +135,13 @@ jobs:
 
       - run: npm run _lychee:setup
 
+      # The built `public/` artifact is throwaway in this job (nothing downstream
+      # reads it), so normalize it in place: rewrite the HTML to strip
+      # data-proofer-ignore links and dedup repeated Docsy chrome, skipping the
+      # copy a separate normalized tree would cost.
+      - name: Normalize public/ in place
+        run: npm run _lychee:normalize:in-place
+
       # Install the pinned lychee ourselves: lychee-action's installer can't
       # handle the versioned release-tarball layout (the binary sits under
       # lychee-<target>/, not at the archive root), so `install` fails.

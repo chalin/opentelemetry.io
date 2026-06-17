@@ -403,3 +403,57 @@ describe('normalizeTree() applies the page policy (P2)', () => {
     );
   });
 });
+
+describe('normalizeTree() in place (CI throwaway tree)', () => {
+  test('rewrites HTML files in the source dir and leaves assets untouched', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'normalize-inplace-'));
+    const src = path.join(root, 'public');
+    mkdirSync(path.join(src, 'sub'), { recursive: true });
+    const pagePath = path.join(src, 'page.html');
+    writeFileSync(
+      pagePath,
+      '<a href="keep">k</a><span data-proofer-ignore><a href="drop">d</a></span>',
+    );
+    const assetPath = path.join(src, 'sub', 'logo.svg');
+    writeFileSync(assetPath, '<svg></svg>');
+    const assetIno = statSync(assetPath).ino;
+
+    const stats = normalizeTree(src, src, { inPlace: true });
+
+    assert.equal(stats.htmlFiles, 1, 'one HTML file is normalized');
+    assert.equal(stats.linkedFiles, 0, 'no files are hard-linked in place');
+    assert.equal(stats.copiedFiles, 0, 'no files are copied in place');
+    assert.deepEqual(
+      findAllHrefs(readFileSync(pagePath, 'utf8')),
+      ['keep'],
+      'the HTML file is rewritten in place with its ignored link stripped',
+    );
+    assert.equal(
+      statSync(assetPath).ino,
+      assetIno,
+      'the asset file is left exactly as it was (same inode, never rewritten)',
+    );
+  });
+
+  test('applies the P2 page policy in place', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'normalize-inplace-p2-'));
+    const src = path.join(root, 'public');
+    mkdirSync(path.join(src, 'docs', 'sub'), { recursive: true });
+    const page = (body) => `<body>${NAVBAR}${body}${FOOTER}</body>`;
+    writeFileSync(path.join(src, 'index.html'), page('<main>home</main>'));
+    writeFileSync(
+      path.join(src, 'docs', 'sub', 'index.html'),
+      page(`<main>sub</main>${LEFTNAV}`),
+    );
+
+    normalizeTree(src, src, { inPlace: true, drop: true, locales: new Set() });
+
+    const read = (...p) => readFileSync(path.join(src, ...p), 'utf8');
+    assert.match(read('index.html'), /td-navbar/, 'en home keeps navbar');
+    assert.doesNotMatch(
+      read('docs', 'sub', 'index.html'),
+      /td-navbar/,
+      'an ordinary page drops its navbar in place',
+    );
+  });
+});
