@@ -1,7 +1,13 @@
 #!/usr/bin/env node
-// Scan the built `public/` HTML for links that htmltest skips via the
+// Audit the built `public/` HTML for links that htmltest skips via the
 // `data-proofer-ignore` attribute, and emit lychee `exclude` regexes that
 // approximate htmltest's element-level ignore.
+//
+// The lychee pilot now strips these links from the HTML before checking (see
+// scripts/lychee/normalize-html), the element-level equivalent of htmltest's
+// IgnoreTagAttribute — so this script is a verification tool, no longer part of
+// the check pipeline. Its href-scanning exports (`findIgnoredHrefs`,
+// `findAllHrefs`) double as the parity oracle reused by the normalizer's tests.
 //
 // Why: htmltest's `IgnoreTagAttribute` (default `data-proofer-ignore`) makes it
 // skip parsing any element — and its children — carrying that attribute, so the
@@ -27,8 +33,9 @@
 //
 // Usage: node scripts/lychee/data-proofer-ignore-to-lychee/index.mjs [public-dir] [lychee-toml]
 // Prints TOML-ready `exclude` array lines on stdout; a grouped summary on
-// stderr. Re-run after a build and paste the lines into the `exclude` array in
-// `lychee.base.toml` (the committed source; `lychee.toml` is generated).
+// stderr. With normalization in place these excludes are redundant — run it to
+// audit which links the attribute covers (e.g. after a Docsy upgrade), not to
+// feed `lychee.base.toml`.
 //
 // cSpell:ignore proofer rawtext
 

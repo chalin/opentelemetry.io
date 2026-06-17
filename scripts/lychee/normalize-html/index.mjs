@@ -22,6 +22,8 @@ import {
   writeFileSync,
   readdirSync,
   mkdirSync,
+  rmSync,
+  linkSync,
   copyFileSync,
 } from 'node:fs';
 import path from 'node:path';
@@ -110,9 +112,15 @@ export function stripIgnoredLinks(html) {
   return out;
 }
 
+// Mirror `srcDir` into a fresh `outDir`: normalize `.html` files, hard-link
+// everything else. Hard links keep the ~200 MB of assets near-free (lychee
+// still needs them on disk to verify internal links/images resolve) while only
+// the rewritten HTML actually costs bytes. Falls back to a copy across devices.
 export function normalizeTree(srcDir, outDir) {
   let htmlFiles = 0;
-  let otherFiles = 0;
+  let linkedFiles = 0;
+  let copiedFiles = 0;
+  rmSync(outDir, { recursive: true, force: true });
   const walk = (src, out) => {
     mkdirSync(out, { recursive: true });
     for (const entry of readdirSync(src, { withFileTypes: true })) {
@@ -124,13 +132,18 @@ export function normalizeTree(srcDir, outDir) {
         writeFileSync(to, stripIgnoredLinks(readFileSync(from, 'utf8')));
         htmlFiles++;
       } else if (entry.isFile()) {
-        copyFileSync(from, to);
-        otherFiles++;
+        try {
+          linkSync(from, to);
+          linkedFiles++;
+        } catch {
+          copyFileSync(from, to);
+          copiedFiles++;
+        }
       }
     }
   };
   walk(srcDir, outDir);
-  return { htmlFiles, otherFiles };
+  return { htmlFiles, linkedFiles, copiedFiles };
 }
 
 function mainCLI() {
@@ -141,10 +154,12 @@ function mainCLI() {
     );
     process.exit(2);
   }
-  const { htmlFiles, otherFiles } = normalizeTree(srcDir, outDir);
+  const start = performance.now();
+  const { htmlFiles, linkedFiles, copiedFiles } = normalizeTree(srcDir, outDir);
+  const secs = ((performance.now() - start) / 1000).toFixed(1);
   console.error(
     `Normalized ${htmlFiles} HTML file(s) into ${outDir} ` +
-      `(${otherFiles} other file(s) copied).`,
+      `(${linkedFiles} linked, ${copiedFiles} copied) in ${secs}s.`,
   );
 }
 

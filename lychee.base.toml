@@ -75,21 +75,16 @@ exclude = [
   '^https://github\.com/open-telemetry/opentelemetry\.io/tree/main/content/en/docs/specs/otel-config/',
   '^https://github\.com/open-telemetry/semantic-conventions/tree/main',
 
-  # --- data-proofer-ignore parity (element-level skip, ported to URL) ---
-  # Docsy "last modified" page-meta links: htmltest skips these via the
-  # `data-proofer-ignore` attribute (its IgnoreTagAttribute), which Lychee has
-  # no equivalent for. They're never in refcache (htmltest never checks them)
-  # and can't be cache-seeded, so exclude by URL to match htmltest's skip.
-  # Derived from the on-page `data-proofer-ignore` elements; regenerate/verify
-  # the set with:
+  # --- data-proofer-ignore parity (now handled by HTML normalization) ---
+  # The Docsy "last modified" page-meta links (`commit/` and the
+  # `compare/<sha>..<sha>` SHA-range form) carry `data-proofer-ignore`. Rather
+  # than exclude them by URL, the normalizer strips their href before lychee
+  # runs — the element-level equivalent of htmltest's IgnoreTagAttribute, so the
+  # checker never enqueues them (see scripts/lychee/normalize-html). Audit the
+  # on-page set with:
   #   node scripts/lychee/data-proofer-ignore-to-lychee/index.mjs
-  '^https://github\.com/open-telemetry/opentelemetry\.io/commit/',
-  # `compare/` is restricted to the page-meta SHA-range form (`<sha>..<sha>`):
-  # the year-in-review posts link real, checked `compare/<tag>...<tag>` URLs
-  # that are NOT under data-proofer-ignore, so a bare `compare/` would wrongly
-  # skip them.
-  '^https://github\.com/open-telemetry/opentelemetry\.io/compare/[0-9a-f]{7,40}\.\.[0-9a-f]{7,40}',
 
+  # --- other blocked/unreliable external hosts ---
   '^https://www\.whatsmyua\.info',
   '^https://v1-30\.docs\.kubernetes\.io/',
 ]

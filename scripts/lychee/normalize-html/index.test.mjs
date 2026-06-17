@@ -13,7 +13,14 @@ import {
   findAllHrefs,
   findIgnoredHrefs,
 } from '../data-proofer-ignore-to-lychee/index.mjs';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import {
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  readFileSync,
+  statSync,
+  existsSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -110,7 +117,7 @@ describe('stripIgnoredLinks()', () => {
 });
 
 describe('normalizeTree()', () => {
-  test('mirrors the tree, normalizing HTML and copying other files', () => {
+  test('mirrors the tree, normalizing HTML and linking other files', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'normalize-tree-'));
     const src = path.join(root, 'src');
     const out = path.join(root, 'out');
@@ -124,7 +131,7 @@ describe('normalizeTree()', () => {
     const stats = normalizeTree(src, out);
 
     assert.equal(stats.htmlFiles, 1, 'one HTML file is normalized');
-    assert.equal(stats.otherFiles, 1, 'one non-HTML file is copied');
+    assert.equal(stats.linkedFiles, 1, 'one non-HTML file is hard-linked');
     assert.deepEqual(
       findAllHrefs(readFileSync(path.join(out, 'page.html'), 'utf8')),
       ['keep'],
@@ -133,7 +140,42 @@ describe('normalizeTree()', () => {
     assert.equal(
       readFileSync(path.join(out, 'sub', 'data.json'), 'utf8'),
       '{"href":"untouched"}',
-      'the non-HTML file is copied byte-for-byte',
+      'the non-HTML file is mirrored byte-for-byte',
+    );
+  });
+
+  test('hard-links non-HTML files instead of copying them', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'normalize-link-'));
+    const src = path.join(root, 'src');
+    const out = path.join(root, 'out');
+    mkdirSync(src, { recursive: true });
+    const asset = path.join(src, 'logo.svg');
+    writeFileSync(asset, '<svg></svg>');
+
+    normalizeTree(src, out);
+
+    assert.equal(
+      statSync(path.join(out, 'logo.svg')).ino,
+      statSync(asset).ino,
+      'the mirrored asset shares the source inode (a hard link, not a copy)',
+    );
+  });
+
+  test('removes stale output from a previous run', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'normalize-stale-'));
+    const src = path.join(root, 'src');
+    const out = path.join(root, 'out');
+    mkdirSync(src, { recursive: true });
+    writeFileSync(path.join(src, 'page.html'), '<a href="keep">k</a>');
+    mkdirSync(out, { recursive: true });
+    writeFileSync(path.join(out, 'deleted.html'), '<a href="gone">g</a>');
+
+    normalizeTree(src, out);
+
+    assert.equal(
+      existsSync(path.join(out, 'deleted.html')),
+      false,
+      'output left over from a prior run is cleared',
     );
   });
 });
