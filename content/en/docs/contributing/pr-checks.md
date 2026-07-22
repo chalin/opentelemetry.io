@@ -124,7 +124,7 @@ path obsolete.
 
 [#9638]: https://github.com/open-telemetry/opentelemetry.io/pull/9638
 
-### `BUILD` and `CHECK LINKS` {.notranslate lang=en}
+### `BUILD` and `CHECK LINKS and CACHE` {#build-and-check-links .notranslate lang=en}
 
 These two checks build the website and verify that all links are valid.
 
